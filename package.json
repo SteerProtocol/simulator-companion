@@ -3,6 +3,9 @@
   "version": "1.0.0",
   "description": "A simple HTTP server to manage Anvil instances",
   "main": "index.js",
+  "bin": {
+    "simulator-companion": "./index.js"
+  },
   "scripts": {
     "start": "node index.js",
     "postversion": "git push && git push --tags"

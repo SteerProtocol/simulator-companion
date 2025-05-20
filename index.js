@@ -25,9 +25,10 @@ const killAnvilProcess = () => {
     }
 };
 
-// Enable CORS for all origins
+// Enable CORS for all origins and parse JSON
 app.use(cors());
-app.use(express.json());
+app.use(express.json({ limit: '1mb' })); // Add explicit limit
+app.use(express.urlencoded({ extended: false })); // Express 5 defaults to false
 
 // Log all requests
 app.use((req, res, next) => {
@@ -45,7 +46,7 @@ const isValidRpcUrl = (url) => {
     }
 };
 
-app.post('/start-anvil', (req, res) => {
+app.post('/start-anvil', async (req, res) => {
     const { blockNumber, rpcUrl } = req.body;
     log(`Received request to start Anvil with RPC URL: ${rpcUrl}${blockNumber ? ` at block ${blockNumber}` : ''}`);
 
@@ -157,12 +158,12 @@ app.post('/stop-anvil', (req, res) => {
 
     if (!anvilProcess) {
         log('Stop request received but no Anvil process is running');
-        return res.status(400).send('Anvil is not running.');
+        return res.sendStatus(400);
     }
 
     log('Sending SIGINT to Anvil process...');
     anvilProcess.kill('SIGINT');
-    res.status(200).send('Anvil process is being stopped.');
+    res.sendStatus(200);
 });
 
 const server = app.listen(port, () => {
